@@ -10,6 +10,10 @@ being much easier and faster to set up.
 Installation
 ------------
 
+As with just about any python application, we recommend creating a new virtualenvironment before proceeding with the following steps. If you don't already have this set up, the easiest way to get `virtualenv` and `virtualenvwrapper` set up is via `virtualenv-burrito <https://github.com/brainsik/virtualenv-burrito>`_.
+
+Once inside your virtualenvironment, here's how to get maildump up and running:
+
 1. `git clone https://github.com/ThiefMaster/maildump.git`
 2. `cd maildump`
 3. `pip install -r requirements.txt`
