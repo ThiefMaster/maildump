@@ -19,7 +19,7 @@ Installation
 
 Point your application's SMTP settings to port 1025 on EMAIL_HOST = '127.0.0.1'
 
-If you are using Django, you can add these settings to your settings.py file:
+If you are using Django, you can add these settings to your settings.py file::
 
     if DEBUG:
         EMAIL_HOST = '127.0.0.1'
