@@ -98,7 +98,8 @@ def main():
 
     # Check if the static folder is writable
     if six.PY3:
-        asset_folder = os.path.join(pkgutil.get_loader('maildump').path, 'static')
+        asset_path = pkgutil.get_loader('maildump').path.rsplit('__')[0]
+        asset_folder = os.path.join(asset_path, 'static')
     else:
         asset_folder = os.path.join(pkgutil.get_loader('maildump').filename, 'static')
 

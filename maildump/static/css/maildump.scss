@@ -86,8 +86,8 @@ body {
     }
 
     > nav.messages {
-        height: (6 * (1em + .5em)) + (1px * 1em/12px); // header + 5 messages
-        min-height: (2 * (1em + .5em)) + (1px * 1em/12px); // header + 1 message
+        height: (6 * (1em + .5em)) + (1px * 1em/12px);
+        min-height: (2 * (1em + .5em)) + (1px * 1em/12px);
         position: relative;
         overflow: auto;
         border-top: 1px solid #fff;
@@ -185,9 +185,7 @@ body {
         }
 
         > header {
-            +clearfix;
             > dl.meta {
-                +clearfix;
                 padding: 0 0.5em 0.5em;
                 dt, dd {
                     padding: 0.25em;
