@@ -8,3 +8,4 @@
 /env-*/
 /maildump/static/assets/
 /maildump/static/.webassets-cache/
+/maildump/static/node_modules/*
