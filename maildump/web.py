@@ -1,6 +1,7 @@
 import os
 import re
-from cStringIO import StringIO
+
+from six import StringIO
 
 import bs4
 from flask import Flask, render_template, request, url_for, send_file, abort
@@ -14,7 +15,8 @@ from maildump.web_realtime import handle_socketio_request
 
 
 RE_CID = re.compile(r'(?P<replace>cid:(?P<cid>.+))')
-RE_CID_URL = re.compile(r'url\(\s*(?P<quote>["\']?)(?P<replace>cid:(?P<cid>[^\\\')]+))(?P=quote)\s*\)')
+RE_CID_URL = re.compile(
+    r'url\(\s*(?P<quote>["\']?)(?P<replace>cid:(?P<cid>[^\\\')]+))(?P=quote)\s*\)')
 
 # Flask app
 app = Flask(__name__)
@@ -32,8 +34,12 @@ js = Bundle('js/lib/jquery.js', 'js/lib/jquery-ui.js', 'js/lib/jquery.hotkeys.js
             filters='rjsmin', output='assets/bundle.%(version)s.js')
 scss = Bundle('css/maildump.scss',
               filters='pyscss', output='assets/maildump.%(version)s.css')
-css = Bundle('css/reset.css', 'css/jquery-ui.css', scss,
-             filters=('cssrewrite', CSSPrefixer(), 'cssmin'), output='assets/bundle.%(version)s.css')
+css = Bundle(
+    'css/reset.css',
+    'css/jquery-ui.css', scss,
+    filters=('cssrewrite', CSSPrefixer(), 'cssmin'),
+    output='assets/bundle.%(version)s.css'
+)
 assets.register('js_all', js)
 assets.register('css_all', css)
 # Socket.IO
@@ -123,7 +129,10 @@ def get_message_info(message_id):
         message['formats']['plain'] = url_for('get_message_plain', message_id=message_id)
     if db.message_has_html(message_id):
         message['formats']['html'] = url_for('get_message_html', message_id=message_id)
-    message['attachments'] = [dict(part, href=_part_url(part)) for part in db.get_message_attachments(message_id)]
+    message['attachments'] = [
+        dict(part, href=_part_url(part))
+        for part in db.get_message_attachments(message_id)
+    ]
     return message
 
 
@@ -138,8 +147,9 @@ def get_message_plain(message_id):
 
 def _fix_cid_links(soup, message_id):
     def _url_from_cid_match(m):
-        return m.group().replace(m.group('replace'),
-                                 url_for('get_message_part', message_id=message_id, cid=m.group('cid')))
+        return m.group().replace(
+            m.group('replace'),
+            url_for('get_message_part', message_id=message_id, cid=m.group('cid')))
     # Iterate over all attributes that do not contain CSS and replace cid references
     for tag in (x for x in soup.descendants if isinstance(x, bs4.Tag)):
         for name, value in tag.attrs.iteritems():
