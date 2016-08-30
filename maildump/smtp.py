@@ -12,7 +12,7 @@ log = Logger(__name__)
 class SMTPChannel(smtpd.SMTPChannel):
     def smtp_EHLO(self, arg):
         if not arg:
-            self.push('501 Syntax: HELO hostname')
+            self.push('501 Syntax: EHLO hostname')
         elif self.__greeting:
             self.push('503 Duplicate HELO/EHLO')
         else:
