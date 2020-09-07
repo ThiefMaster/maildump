@@ -5,7 +5,6 @@
 /*.egg-info/
 /dist/
 /build/
-/env/
-/env-*/
+/.venv/
 /maildump/static/assets/
 /maildump/static/.webassets-cache/
