@@ -146,9 +146,13 @@ def main():
         assets.auto_build = args.autobuild_assets
         app.config['MAILDUMP_HTPASSWD'] = None
         if args.htpasswd:
-            # passlib is broken on py39, so we keep the import local for now.
+            # passlib is broken on py39, hence the local import
             # https://foss.heptapod.net/python-libs/passlib/-/issues/115
-            from passlib.apache import HtpasswdFile
+            try:
+                from passlib.apache import HtpasswdFile
+            except OSError:
+                print('Are you using Python 3.9? If yes, authentication is currently not available due to a bug.\n\n')
+                raise
             app.config['MAILDUMP_HTPASSWD'] = HtpasswdFile(args.htpasswd)
         app.config['MAILDUMP_NO_QUIT'] = args.no_quit
 
