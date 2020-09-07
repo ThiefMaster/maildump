@@ -37,9 +37,9 @@ def terminate_server(sig, frame):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--smtp-ip', default='127.0.0.1', metavar='IP', help='SMTP ip (default: 127.0.0.1)')
-    parser.add_argument('--smtp-port', default=1025, type=int, metavar='PORT', help='SMTP port (deault: 1025)')
+    parser.add_argument('--smtp-port', default=1025, type=int, metavar='PORT', help='SMTP port (default: 1025)')
     parser.add_argument('--http-ip', default='127.0.0.1', metavar='IP', help='HTTP ip (default: 127.0.0.1)')
-    parser.add_argument('--http-port', default=1080, type=int, metavar='PORT', help='HTTP port (deault: 1080)')
+    parser.add_argument('--http-port', default=1080, type=int, metavar='PORT', help='HTTP port (default: 1080)')
     parser.add_argument('--db', metavar='PATH', help='SQLite database - in-memory if missing')
     parser.add_argument('--htpasswd', metavar='HTPASSWD', help='Apache-style htpasswd file')
     parser.add_argument('-v', '--version', help='Display the version and exit', action='store_true')
