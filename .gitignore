@@ -2,6 +2,7 @@
 *.pyc
 *.pid
 /.idea/
+/.vscode/
 /*.egg-info/
 /dist/
 /build/
