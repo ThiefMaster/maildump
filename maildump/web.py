@@ -1,17 +1,16 @@
 import os
 import re
-from cStringIO import StringIO
 
 import bs4
-from flask import Flask, render_template, request, url_for, send_file, abort
-from flask_assets import Environment, Bundle
+from cStringIO import StringIO
+from flask import Flask, abort, render_template, request, send_file, url_for
+from flask_assets import Bundle, Environment
 from logbook import Logger
 
 import maildump
 from maildump import db
-from maildump.util import rest, bool_arg, CSSPrefixer, get_version
+from maildump.util import CSSPrefixer, bool_arg, get_version, rest
 from maildump.web_realtime import handle_socketio_request
-
 
 RE_CID = re.compile(r'(?P<replace>cid:(?P<cid>.+))')
 RE_CID_URL = re.compile(r'url\(\s*(?P<quote>["\']?)(?P<replace>cid:(?P<cid>[^\\\')]+))(?P=quote)\s*\)')

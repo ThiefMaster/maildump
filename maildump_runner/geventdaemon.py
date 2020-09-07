@@ -1,6 +1,6 @@
-import daemon
 import signal
 
+import daemon
 
 # Moved gevent imports into functions.
 # See http://stackoverflow.com/q/11587164/298479

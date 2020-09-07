@@ -7,7 +7,6 @@ from logbook import Logger
 from maildump.util import decode_header, split_addresses
 from maildump.web_realtime import broadcast
 
-
 log = Logger(__name__)
 _conn = None
 

@@ -5,7 +5,6 @@ from logbook import Logger
 
 from maildump.db import add_message
 
-
 log = Logger(__name__)
 
 

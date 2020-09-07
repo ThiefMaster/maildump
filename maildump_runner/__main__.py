@@ -3,12 +3,12 @@
 from __future__ import print_function
 
 import argparse
-import lockfile
 import os
 import pkgutil
 import signal
 import sys
 
+import lockfile
 import logbook
 from daemon.pidfile import TimeoutPIDLockFile
 from geventdaemon import GeventDaemonContext

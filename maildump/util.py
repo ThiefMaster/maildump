@@ -1,12 +1,12 @@
 import json
-import pkg_resources
 from datetime import datetime
 from email.header import decode_header as _decode_header
 from email.utils import getaddresses
 from functools import wraps
 
-from pytz import utc
+import pkg_resources
 from flask import current_app
+from pytz import utc
 from webassets.filter.cssprefixer import CSSPrefixer as _CSSPrefixer
 
 

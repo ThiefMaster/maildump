@@ -5,11 +5,10 @@ from gevent.event import Event
 from logbook import Logger
 from socketio.server import SocketIOServer
 
-from maildump.db import connect, disconnect, create_tables
-from maildump.smtp import smtp_handler, SMTPServer
+from maildump.db import connect, create_tables, disconnect
+from maildump.smtp import SMTPServer, smtp_handler
 from maildump.web import app
 from maildump.web_realtime import broadcast
-
 
 log = Logger(__name__)
 stopper = Event()
