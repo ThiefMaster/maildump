@@ -14,7 +14,6 @@ import logbook
 from daemon.pidfile import TimeoutPIDLockFile
 from logbook import NullHandler
 from logbook.more import ColorizedStderrHandler
-from passlib.apache import HtpasswdFile
 
 from .geventdaemon import GeventDaemonContext
 
@@ -145,7 +144,12 @@ def main():
 
         assets.debug = app.debug = args.debug
         assets.auto_build = args.autobuild_assets
-        app.config['MAILDUMP_HTPASSWD'] = HtpasswdFile(args.htpasswd) if args.htpasswd else None
+        app.config['MAILDUMP_HTPASSWD'] = None
+        if args.htpasswd:
+            # passlib is broken on py39, so we keep the import local for now.
+            # https://foss.heptapod.net/python-libs/passlib/-/issues/115
+            from passlib.apache import HtpasswdFile
+            app.config['MAILDUMP_HTPASSWD'] = HtpasswdFile(args.htpasswd)
         app.config['MAILDUMP_NO_QUIT'] = args.no_quit
 
         level = logbook.DEBUG if args.debug else logbook.INFO
