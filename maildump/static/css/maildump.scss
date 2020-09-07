@@ -16,8 +16,8 @@ html, body {
 }
 
 body {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
+    display: flex;
+    flex-direction: column;
     font-size: 12px;
     background: #eee;
 
@@ -145,9 +145,9 @@ body {
     }
 
     > article {
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        box-flex: 1;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
 
         > aside.no-message-mark {
             display: none;
@@ -159,10 +159,10 @@ body {
             }
 
             > aside.no-message-mark {
-                display: box !important;
-                box-pack: center;
-                box-align: center;
-                box-flex: 1;
+                display: flex !important;
+                justify-content: center;
+                align-items: center;
+                flex: 1;
                 font-size: 64px;
                 font-weight: bold;
                 user-select: none;
@@ -249,7 +249,6 @@ body {
                     }
 
                     &.action {
-                        display: inline-block;
                         float: right;
                         margin: 0 0.25em;
                     }
@@ -258,8 +257,8 @@ body {
         }
 
         > iframe.body {
-            display: -webkit-box;
-            box-flex: 1;
+            display: flex;
+            flex: 1;
             background: #fff;
         }
     }
