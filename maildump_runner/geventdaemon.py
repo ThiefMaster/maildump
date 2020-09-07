@@ -69,23 +69,21 @@ class GeventDaemonContext(daemon.DaemonContext):
             gevent.hub.Hub.print_exception = print_exception
 
     def _setup_gevent_signals(self):
-        import gevent
+        from gevent.signal import signal as gevent_signal
         if self.gevent_signal_map is None:
-            gevent.signal(signal.SIGTERM, self.terminate, signal.SIGTERM, None)
+            gevent_signal(signal.SIGTERM, self.terminate)
             return
 
         for sig, target in self.gevent_signal_map.items():
             if target is None:
                 raise ValueError('invalid handler argument for signal %s', str(sig))
             tocall = target
-            args = [sig, None]
             if isinstance(target, list):
                 if not target:
                     raise ValueError('handler list is empty for signal %s', str(sig))
                 tocall = target[0]
-                args = target[1:]
-            elif isinstance(target, basestring):
+            elif isinstance(target, str):
                 assert not target.startswith('_')
                 tocall = getattr(self, target)
 
-            gevent.signal(sig, tocall, *args)
+            gevent_signal(sig, tocall)

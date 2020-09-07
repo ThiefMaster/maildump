@@ -7,7 +7,6 @@ from functools import wraps
 import pkg_resources
 from flask import current_app
 from pytz import utc
-from webassets.filter.cssprefixer import CSSPrefixer as _CSSPrefixer
 
 
 def _json_default(obj):
@@ -29,7 +28,10 @@ def bool_arg(arg):
 
 
 def decode_header(value):
-    return ''.join(unicode(decoded, charset or 'utf-8') for decoded, charset in _decode_header(value)).encode('utf-8')
+    return ''.join(
+        str(decoded, charset or 'utf-8') if isinstance(decoded, bytes) else decoded
+        for decoded, charset in _decode_header(value)
+    )
 
 
 def split_addresses(value):
@@ -55,7 +57,7 @@ def rest(f):
             response = ret
         elif isinstance(ret, tuple):
             # code, result_dict|msg_string
-            if isinstance(ret[1], basestring):
+            if isinstance(ret[1], str):
                 response = jsonify(msg=ret[1])
             else:
                 response = jsonify(**ret[1])
@@ -72,7 +74,3 @@ def get_version():
         return 'v' + pkg_resources.get_distribution('maildump').version
     except pkg_resources.DistributionNotFound:
         return 'dev'
-
-
-class CSSPrefixer(_CSSPrefixer):
-    max_debug_level = None

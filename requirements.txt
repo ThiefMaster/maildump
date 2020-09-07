@@ -3,9 +3,7 @@ Flask-Assets
 Logbook
 beautifulsoup4
 cssmin
-cssprefixer
-cssutils
-gevent<1.1
+gevent
 gevent-socketio
 gevent-websocket
 html5lib

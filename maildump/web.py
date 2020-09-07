@@ -1,15 +1,15 @@
 import os
 import re
+from io import BytesIO
 
 import bs4
-from cStringIO import StringIO
 from flask import Flask, abort, render_template, request, send_file, url_for
 from flask_assets import Bundle, Environment
 from logbook import Logger
 
 import maildump
 from maildump import db
-from maildump.util import CSSPrefixer, bool_arg, get_version, rest
+from maildump.util import bool_arg, get_version, rest
 from maildump.web_realtime import handle_socketio_request
 
 RE_CID = re.compile(r'(?P<replace>cid:(?P<cid>.+))')
@@ -32,7 +32,7 @@ js = Bundle('js/lib/jquery.js', 'js/lib/jquery-ui.js', 'js/lib/jquery.hotkeys.js
 scss = Bundle('css/maildump.scss',
               filters='pyscss', output='assets/maildump.%(version)s.css')
 css = Bundle('css/reset.css', 'css/jquery-ui.css', scss,
-             filters=('cssrewrite', CSSPrefixer(), 'cssmin'), output='assets/bundle.%(version)s.css')
+             filters=('cssrewrite', 'cssmin'), output='assets/bundle.%(version)s.css')
 assets.register('js_all', js)
 assets.register('css_all', css)
 # Socket.IO
@@ -102,7 +102,7 @@ def _part_response(part, body=None, charset=None):
         body = part['body']
     if charset != 'utf-8':
         body = body.decode(charset).encode('utf-8')
-    io = StringIO(body)
+    io = BytesIO(body)
     io.seek(0)
     response = send_file(io, part['type'], part['is_attachment'], part['filename'])
     response.charset = charset
@@ -141,7 +141,7 @@ def _fix_cid_links(soup, message_id):
                                  url_for('get_message_part', message_id=message_id, cid=m.group('cid')))
     # Iterate over all attributes that do not contain CSS and replace cid references
     for tag in (x for x in soup.descendants if isinstance(x, bs4.Tag)):
-        for name, value in tag.attrs.iteritems():
+        for name, value in tag.attrs.items():
             if isinstance(value, list):
                 value = ' '.join(value)
             m = RE_CID.match(value)
@@ -161,7 +161,7 @@ def get_message_html(message_id):
     charset = part['charset'] or 'utf-8'
     soup = bs4.BeautifulSoup(part['body'].decode(charset), 'html5lib')
     _fix_cid_links(soup, message_id)
-    return _part_response(part, str(soup), 'utf-8')
+    return _part_response(part, soup.encode('utf-8'), 'utf-8')
 
 
 @app.route('/messages/<int:message_id>.source', methods=('GET',))
@@ -170,7 +170,7 @@ def get_message_source(message_id):
     message = db.get_message(message_id)
     if not message:
         return 404, 'message does not exist'
-    io = StringIO(message['source'])
+    io = BytesIO(message['source'])
     io.seek(0)
     return send_file(io, 'text/plain')
 
@@ -181,7 +181,7 @@ def get_message_eml(message_id):
     message = db.get_message(message_id)
     if not message:
         return 404, 'message does not exist'
-    io = StringIO(message['source'])
+    io = BytesIO(message['source'])
     io.seek(0)
     return send_file(io, 'message/rfc822')
 

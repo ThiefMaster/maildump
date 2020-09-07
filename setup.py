@@ -41,7 +41,7 @@ setup(
     long_description=readme,
     url='https://github.com/ThiefMaster/maildump',
     download_url='https://github.com/ThiefMaster/maildump',
-    author=u'Adrian Mönnich',
+    author='Adrian Mönnich',
     author_email='adrian@planetcoding.net',
     license='MIT',
     zip_safe=False,
@@ -49,7 +49,7 @@ setup(
     packages=('maildump', 'maildump_runner'),
     entry_points={
         'console_scripts': [
-            'maildump = maildump_runner.__main__:main',
+            'maildump = maildump_runner.main:main',
         ],
     },
     install_requires=requirements,
@@ -57,8 +57,8 @@ setup(
     classifiers=[
         'Development Status :: 4 - Beta',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Environment :: No Input/Output (Daemon)',
         'Environment :: Web Environment',
         'Intended Audience :: Developers',

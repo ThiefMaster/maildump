@@ -76,9 +76,10 @@ def add_message(sender, recipients, body, message):
             (?, ?, ?, ?, ?, ?, datetime('now'))
     """
 
-    all_recipients = {'to': map(decode_header, recipients),
-                      'cc': split_addresses(decode_header(message['CC'])) if 'CC' in message else [],
-                      'bcc': split_addresses(decode_header(message['BCC'])) if 'BCC' in message else []}
+    to_list = [decode_header(r) for r in recipients]
+    cc_list = split_addresses(decode_header(message['CC'])) if 'CC' in message else []
+    bcc_list = split_addresses(decode_header(message['BCC'])) if 'BCC' in message else []
+    all_recipients = {'to': to_list, 'cc': cc_list, 'bcc': bcc_list}
     cur = _conn.cursor()
     cur.execute(sql, (decode_header(sender),
                       json.dumps(all_recipients),
@@ -216,7 +217,7 @@ def message_has_plain(message_id):
 
 def get_messages(lightweight=False):
     cols = _get_message_cols(lightweight)
-    rows = map(dict, _conn.execute('SELECT {0} FROM message ORDER BY created_at ASC'.format(cols)).fetchall())
+    rows = list(map(dict, _conn.execute('SELECT {0} FROM message ORDER BY created_at ASC'.format(cols)).fetchall()))
     for row in rows:
         row['recipients'] = _parse_recipients(row['recipients'])
     return rows

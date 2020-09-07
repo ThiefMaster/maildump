@@ -16,8 +16,8 @@ html, body {
 }
 
 body {
-    display: box;
-    box-orient: vertical;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
     font-size: 12px;
     background: #eee;
 
@@ -145,8 +145,8 @@ body {
     }
 
     > article {
-        display: box;
-        box-orient: vertical;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
         box-flex: 1;
 
         > aside.no-message-mark {
@@ -258,7 +258,7 @@ body {
         }
 
         > iframe.body {
-            display: box;
+            display: -webkit-box;
             box-flex: 1;
             background: #fff;
         }

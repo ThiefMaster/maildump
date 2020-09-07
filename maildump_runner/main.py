@@ -7,14 +7,16 @@ import os
 import pkgutil
 import signal
 import sys
+from pathlib import Path
 
 import lockfile
 import logbook
 from daemon.pidfile import TimeoutPIDLockFile
-from geventdaemon import GeventDaemonContext
 from logbook import NullHandler
 from logbook.more import ColorizedStderrHandler
 from passlib.apache import HtpasswdFile
+
+from .geventdaemon import GeventDaemonContext
 
 
 def read_pidfile(path):
@@ -95,9 +97,9 @@ def main():
         sys.exit(1)
 
     # Check if the static folder is writable
-    asset_folder = os.path.join(pkgutil.get_loader('maildump').filename, 'static')
+    asset_folder = Path(pkgutil.get_loader('maildump').get_filename()).parent / 'static'
     if args.autobuild_assets and not os.access(asset_folder, os.W_OK):
-        print('Autobuilding assets requires write access to {0}'.format(asset_folder))
+        print(f'Autobuilding assets requires write access to {asset_folder}')
         sys.exit(1)
 
     daemon_kw = {'monkey_greenlet_report': False,
