@@ -77,7 +77,7 @@
             var notificationButton = $('nav.app .notifications a');
 
             var updateNotificationButton = function updateNotificationButton() {
-                var enabled = $.jStorage.get('notifications') && NotificationUtil.checkPermission();
+                const enabled = localStorage.getItem('notifications') === 'true' && NotificationUtil.checkPermission();
                 notificationButton.text(enabled ? 'Disable notifications' : 'Enable notifications');
             };
 
@@ -89,12 +89,12 @@
                         alert('You need to allow notifications via site permissions.');
                         return;
                     case true: // allowed
-                        $.jStorage.set('notifications', !$.jStorage.get('notifications'));
+                        localStorage.setItem('notifications', localStorage.getItem('notifications') !== 'true');
                         updateNotificationButton();
                         break;
                     default: // not specified (prompt user)
                         NotificationUtil.requestPermission(function(perm) {
-                            $.jStorage.set('notifications', !!perm);
+                            localStorage.setItem('notifications', !!perm);
                             updateNotificationButton();
                         });
                         break;
@@ -161,7 +161,7 @@
         waitForEvents({
             add_message: id => {
                 console.log('SSE: received new message', id);
-                Message.load(+id, $.jStorage.get('notifications'));
+                Message.load(+id, localStorage.getItem('notifications') === 'true');
             },
             delete_message: id => {
                 console.log('SSE: deleted message', id);
