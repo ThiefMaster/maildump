@@ -10,7 +10,7 @@ from logbook import Logger
 import maildump
 from maildump import db
 from maildump.util import bool_arg, get_version, rest
-from maildump.web_realtime import handle_socketio_request
+from maildump.web_realtime import handle_sse_request
 
 RE_CID = re.compile(r'(?P<replace>cid:(?P<cid>.+))')
 RE_CID_URL = re.compile(r'url\(\s*(?P<quote>["\']?)(?P<replace>cid:(?P<cid>[^\\\')]+))(?P=quote)\s*\)')
@@ -26,7 +26,7 @@ assets.config['PYSCSS_STATIC_ROOT'] = os.path.join(os.path.dirname(__file__), 's
 assets.config['PYSCSS_STATIC_URL'] = '/static'
 assets.config['PYSCSS_DEBUG_INFO'] = False
 js = Bundle('js/lib/jquery.js', 'js/lib/jquery-ui.js', 'js/lib/jquery.hotkeys.js',
-            'js/lib/handlebars.js', 'js/lib/moment.js', 'js/lib/socket.io.js', 'js/lib/jstorage.js',
+            'js/lib/handlebars.js', 'js/lib/moment.js', 'js/lib/jstorage.js',
             'js/util.js', 'js/message.js', 'js/maildump.js',
             filters='rjsmin', output='assets/bundle.%(version)s.js')
 scss = Bundle('css/maildump.scss',
@@ -35,8 +35,7 @@ css = Bundle('css/reset.css', 'css/jquery-ui.css', scss,
              filters=('cssrewrite', 'cssmin'), output='assets/bundle.%(version)s.css')
 assets.register('js_all', js)
 assets.register('css_all', css)
-# Socket.IO
-app.add_url_rule('/socket.io/<path:remaining>', view_func=handle_socketio_request)
+app.add_url_rule('/event-stream', view_func=handle_sse_request)
 
 
 @app.before_request

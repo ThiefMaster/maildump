@@ -1,6 +1,33 @@
 (function($) {
     'use strict';
 
+    let evtSource = null;
+    const waitForEvents = (events, states) => {
+        evtSource = new EventSource('/event-stream');
+        let wasConnected = false;
+
+        evtSource.onopen = () => {
+            wasConnected = true;
+            states.connected();
+        };
+        evtSource.onerror = evt => {
+            if (wasConnected) {
+                states.disconnected();
+            }
+            if (evt.target.readyState === EventSource.CLOSED) {
+                setTimeout(() => {
+                    waitForEvents(events, states);
+                }, 1000);
+            }
+        };
+        evtSource.onmessage = evt => console.log(evt.data);
+        Object.entries(events).forEach(([evt, cb]) => {
+            evtSource.addEventListener(evt, e => {
+                cb(e.data);
+            });
+        })
+    };
+
     $(document).ready(function() {
         // Misc stuff and initialization
         $('.resizer').on('mousedown', function(e) {
@@ -121,40 +148,47 @@
             }
         });
 
-        // Load initial message list
-        Message.loadAll();
-
-        // Real-time updates
-        var socket = io.connect(undefined, {
-            'reconnection limit': 10000,
-            'max reconnection attempts': Infinity
-        });
-        var terminating = false;
+        let terminating = false;
         window.onbeforeunload = function() {
             terminating = true;
-            socket.disconnect();
+            if (evtSource) {
+                evtSource.close();
+            }
             Message.closeNotifications()
         };
-        socket.on('connect', function() {
-            $('#disconnected-dialog').dialog('close');
-        }).on('reconnect', function() {
-            Message.loadAll();
-        }).on('disconnect', function() {
-            if(terminating) {
-                return;
+
+        // Real-time updates
+        waitForEvents({
+            add_message: id => {
+                console.log('SSE: received new message', id);
+                Message.load(+id, $.jStorage.get('notifications'));
+            },
+            delete_message: id => {
+                console.log('SSE: deleted message', id);
+                const msg = Message.get(+id);
+                if (msg) {
+                    msg.del();
+                }
+            },
+            delete_messages: () => {
+                console.log('SSE: deleted all emssages');
+                Message.deleteAll();
             }
-            $('#loading-dialog').dialog('close');
-            $('#disconnected-dialog').dialog('open');
-        }).on('add_message', function(id) {
-            Message.load(id, $.jStorage.get('notifications'));
-        }).on('delete_message', function(id) {
-            var msg = Message.get(id);
-            if(msg) {
-                msg.del();
+        }, {
+            connected: () => {
+                console.log('SSE: connected');
+                $('#disconnected-dialog').dialog('close');
+                Message.loadAll();
+            },
+            disconnected: () => {
+                console.log('SSE: disconnected');
+                if (terminating) {
+                    return;
+                }
+                $('#loading-dialog').dialog('close');
+                $('#disconnected-dialog').dialog('open');
             }
-        }).on('delete_messages', function() {
-            Message.deleteAll();
-        });
+        })
 
         // Keyboard shortcuts
         registerHotkeys({

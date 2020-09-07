@@ -1,27 +1,23 @@
 import asyncore
 
 import gevent
-from gevent.event import Event
+from gevent.pywsgi import WSGIServer
 from logbook import Logger
-from socketio.server import SocketIOServer
 
 from maildump.db import connect, create_tables, disconnect
 from maildump.smtp import SMTPServer, smtp_handler
 from maildump.web import app
-from maildump.web_realtime import broadcast
 
 log = Logger(__name__)
-stopper = Event()
-socketio_server = None
+stopper = None
 
 
 def start(http_host, http_port, smtp_host, smtp_port, db_path=None):
-    global socketio_server
+    global stopper
     # Webserver
     log.notice('Starting web server on http://{0}:{1}'.format(http_host, http_port))
-    socketio_server = SocketIOServer((http_host, http_port), app,
-                                     log='default' if app.debug else None)
-    socketio_server.start()
+    http_server = WSGIServer((http_host, http_port), app)
+    stopper = http_server.close
     # SMTP server
     log.notice('Starting smtp server on {0}:{1}'.format(smtp_host, smtp_port))
     SMTPServer((smtp_host, smtp_port), smtp_handler)
@@ -29,17 +25,12 @@ def start(http_host, http_port, smtp_host, smtp_port, db_path=None):
     # Database
     connect(db_path)
     create_tables()
-    # Wait....
-    try:
-        stopper.wait()
-    except KeyboardInterrupt:
-        print
-    else:
-        log.debug('Received stop signal')
+    http_server.serve_forever()  # runs until stopper is triggered
+    log.debug('Received stop signal')
     # Clean up
     disconnect()
     log.notice('Terminating')
 
 
 def stop():
-    stopper.set()
+    stopper()

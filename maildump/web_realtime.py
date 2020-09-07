@@ -1,19 +1,31 @@
-from flask import current_app, request
-from socketio import socketio_manage
-from socketio.namespace import BaseNamespace
+from flask import current_app
+from gevent.queue import Queue
+
+clients = set()
 
 
-def broadcast(event, *args):
-    from maildump import socketio_server  # avoid circular import
-    pkt = dict(type='event', name=event, args=args, endpoint='')
-    for socket in socketio_server.sockets.values():
-        socket.send_packet(pkt)
+def broadcast(event, data=None):
+    for q in clients:
+        q.put((event, data))
 
 
-def handle_socketio_request(remaining):
-    try:
-        socketio_manage(request.environ, {'': BaseNamespace}, request)
-    except Exception:
-        current_app.logger.exception('Exception while handling socketio connection')
-        raise
-    return current_app.response_class()
+def handle_sse_request():
+    return current_app.response_class(_gen(), mimetype='text/event-stream')
+
+
+def _gen():
+    yield _sse('connected')
+    q = Queue()
+    clients.add(q)
+    while True:
+        msg = q.get()
+        try:
+            yield _sse(*msg)
+        except GeneratorExit:
+            clients.remove(q)
+            raise
+
+
+def _sse(event, data=None):
+    parts = [f'event: {event}', f'data: {data or ""}']
+    return ('\r\n'.join(parts) + '\r\n\r\n').encode()

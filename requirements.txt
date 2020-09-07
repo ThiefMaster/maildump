@@ -4,8 +4,6 @@ Logbook
 beautifulsoup4
 cssmin
 gevent
-gevent-socketio
-gevent-websocket
 html5lib
 lockfile
 passlib

@@ -140,8 +140,8 @@ def main():
 
     with context:
         # Imports are here to avoid importing anything before monkeypatching
-        from maildump import app, start
-        from maildump.web import assets
+        from maildump import start
+        from maildump.web import app, assets
 
         assets.debug = app.debug = args.debug
         assets.auto_build = args.autobuild_assets
