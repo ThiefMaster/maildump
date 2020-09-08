@@ -1,9 +1,0 @@
-Flask
-Logbook
-beautifulsoup4
-gevent
-html5lib
-lockfile
-passlib
-python-daemon
-pytz
