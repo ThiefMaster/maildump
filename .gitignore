@@ -1,6 +1,7 @@
 .*.swp
-*.pyc
+*.py[co]
 *.pid
+__pycache__/
 /.idea/
 /.vscode/
 /*.egg-info/
