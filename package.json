@@ -1,0 +1,18 @@
+{
+  "name": "root",
+  "private": true,
+  "scripts": {
+    "build": "rm maildump/static/dist/*; parcel build maildump/templates/index.html -d maildump/static/dist/ --public-url /static && mv maildump/static/dist/index.html maildump/templates/index.parcel.html"
+  },
+  "devDependencies": {
+    "parcel": "^1.12.4",
+    "sass": "^1.26.10"
+  },
+  "dependencies": {
+    "handlebars": "^4.7.6",
+    "jquery": "^2.2.4",
+    "jquery-ui": "~1.10.5",
+    "jquery.hotkeys": "^0.1.0",
+    "moment": "^2.27.0"
+  }
+}

@@ -1,12 +1,9 @@
 Flask
-Flask-Assets
 Logbook
 beautifulsoup4
-cssmin
 gevent
 html5lib
 lockfile
 passlib
-pyScss
 python-daemon
 pytz

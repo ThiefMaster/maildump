@@ -1,4 +1,3 @@
-// REST
 (function($, global) {
     'use strict';
     var messages = {};

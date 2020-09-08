@@ -1,10 +1,8 @@
-import os
 import re
 from io import BytesIO
 
 import bs4
 from flask import Flask, abort, render_template, request, send_file, url_for
-from flask_assets import Bundle, Environment
 from logbook import Logger
 
 import maildump
@@ -16,25 +14,8 @@ RE_CID = re.compile(r'(?P<replace>cid:(?P<cid>.+))')
 RE_CID_URL = re.compile(r'url\(\s*(?P<quote>["\']?)(?P<replace>cid:(?P<cid>[^\\\')]+))(?P=quote)\s*\)')
 
 # Flask app
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static/dist', static_url_path='/static')
 app._logger = log = Logger(__name__)
-# Flask-Assets
-assets = environment = Environment(app)  # environment is needed for webassets cli build
-assets.debug = True  # yuck! but the commandline script only supports *disabling* debug
-assets.auto_build = False
-assets.config['PYSCSS_STATIC_ROOT'] = os.path.join(os.path.dirname(__file__), 'static')
-assets.config['PYSCSS_STATIC_URL'] = '/static'
-assets.config['PYSCSS_DEBUG_INFO'] = False
-js = Bundle('js/lib/jquery.js', 'js/lib/jquery-ui.js', 'js/lib/jquery.hotkeys.js',
-            'js/lib/handlebars.js', 'js/lib/moment.js', 'js/util.js',
-            'js/message.js', 'js/maildump.js',
-            filters='rjsmin', output='assets/bundle.%(version)s.js')
-scss = Bundle('css/maildump.scss',
-              filters='pyscss', output='assets/maildump.%(version)s.css')
-css = Bundle('css/reset.css', 'css/jquery-ui.css', scss,
-             filters=('cssrewrite', 'cssmin'), output='assets/bundle.%(version)s.css')
-assets.register('js_all', js)
-assets.register('css_all', css)
 app.add_url_rule('/event-stream', view_func=handle_sse_request)
 
 
@@ -55,7 +36,7 @@ def check_auth():
 
 @app.route('/')
 def home():
-    return render_template('index.html', version=get_version())
+    return render_template('index.parcel.html', version=get_version())
 
 
 @app.route('/', methods=('DELETE',))

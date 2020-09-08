@@ -1,3 +1,6 @@
+import Handlebars from 'handlebars';
+import moment from 'moment';
+
 // Templating
 (function($, global) {
     'use strict';

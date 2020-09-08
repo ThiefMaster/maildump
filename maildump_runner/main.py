@@ -1,13 +1,9 @@
 #!/usr/bin/env python
 
-from __future__ import print_function
-
 import argparse
 import os
-import pkgutil
 import signal
 import sys
-from pathlib import Path
 
 import lockfile
 import logbook
@@ -47,8 +43,6 @@ def main():
     parser.add_argument('-f', '--foreground', help='Run in the foreground (default if no pid file is specified)',
                         action='store_true')
     parser.add_argument('-d', '--debug', help='Run the web app in debug mode', action='store_true')
-    parser.add_argument('-a', '--autobuild-assets', help='Automatically rebuild assets if necessary',
-                        action='store_true')
     parser.add_argument('-n', '--no-quit', help='Do not allow clients to terminate the application',
                         action='store_true')
     parser.add_argument('-p', '--pidfile', help='Use a PID file')
@@ -95,12 +89,6 @@ def main():
         print('Htpasswd file does not exist')
         sys.exit(1)
 
-    # Check if the static folder is writable
-    asset_folder = Path(pkgutil.get_loader('maildump').get_filename()).parent / 'static'
-    if args.autobuild_assets and not os.access(asset_folder, os.W_OK):
-        print(f'Autobuilding assets requires write access to {asset_folder}')
-        sys.exit(1)
-
     daemon_kw = {'monkey_greenlet_report': False,
                  'signal_map': {signal.SIGTERM: terminate_server,
                                 signal.SIGINT: terminate_server}}
@@ -140,10 +128,9 @@ def main():
     with context:
         # Imports are here to avoid importing anything before monkeypatching
         from maildump import start
-        from maildump.web import app, assets
+        from maildump.web import app
 
-        assets.debug = app.debug = args.debug
-        assets.auto_build = args.autobuild_assets
+        app.debug = args.debug
         app.config['MAILDUMP_HTPASSWD'] = None
         if args.htpasswd:
             # passlib is broken on py39, hence the local import

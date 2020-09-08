@@ -1,29 +1,6 @@
-# coding=utf-8
-
-import os
-import subprocess
 import sys
 
 from setuptools import setup
-from setuptools.command.build_py import build_py
-
-
-class build_py_with_assets(build_py):
-    def run(self):
-        if not self.dry_run:
-            self._build_assets()
-        build_py.run(self)
-
-    def _build_assets(self):
-        asset_dir = 'maildump/static/assets'
-        # Lame check if we have prebuilt assets. If we do so we are probably installing from a pypi package which
-        # means that webassets might not be installed yet and thus we cannot build the assets now...
-        if os.path.exists(asset_dir) and os.listdir(asset_dir):
-            return
-        args = ['webassets', '-m', 'maildump.web', 'build']
-        with open(os.devnull, 'w') as devnull:
-            subprocess.check_call(args, stderr=devnull)
-            subprocess.check_call(args + ['--production'], stderr=devnull)
 
 
 with open('requirements.txt') as f:
@@ -54,7 +31,6 @@ setup(
     },
     python_requires='>= 3.6',
     install_requires=requirements,
-    cmdclass={'build_py': build_py_with_assets},
     classifiers=[
         'Development Status :: 4 - Beta',
         'Programming Language :: Python',

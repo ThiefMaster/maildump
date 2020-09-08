@@ -2,14 +2,10 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='images/icon_16x16.png') }}">
+    <link rel="shortcut icon" type="image/png" href="../static/images/icon_16x16.png">
     <title>MailDump</title>
-    {% assets 'css_all' -%}
-        <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
-    {% endassets %}
-    {% assets 'js_all' -%}
-        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-    {% endassets %}
+    <link rel="stylesheet" type="text/css" href="../static/css/maildump.scss">
+    <script type="text/javascript" src="../static/js/maildump.js"></script>
 </head>
 <body>
     <header class="top">

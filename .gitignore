@@ -7,5 +7,7 @@
 /dist/
 /build/
 /.venv/
-/maildump/static/assets/
-/maildump/static/.webassets-cache/
+/node_modules/
+/.cache/
+/maildump/static/dist/
+/maildump/templates/index.parcel.html

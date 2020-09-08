@@ -1,3 +1,9 @@
+import './jquery-stub';
+import 'jquery-ui';
+import 'jquery.hotkeys';
+import './util';
+import './message';
+
 (function($) {
     'use strict';
 
