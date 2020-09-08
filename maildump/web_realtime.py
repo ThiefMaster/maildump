@@ -1,5 +1,5 @@
 from flask import current_app
-from gevent.queue import Queue
+from gevent.queue import Empty, Queue
 
 clients = set()
 
@@ -18,7 +18,11 @@ def _gen():
     q = Queue()
     clients.add(q)
     while True:
-        msg = q.get()
+        try:
+            msg = q.get(timeout=60)
+        except Empty:
+            yield _sse('ping')
+            continue
         try:
             yield _sse(*msg)
         except GeneratorExit:
