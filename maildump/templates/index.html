@@ -106,8 +106,10 @@
         <dt class="bcc">BCC</dt>
         <dd class="bcc">{{ join recipients.bcc }}</dd>
         {{/if}}
+        {{# if subject }}
         <dt class="subject">Subject</dt>
         <dd class="subject">{{ subject }}</dd>
+        {{/if}}
         {{# if attachments.length }}
         <dt class="attachments">Attachments</dt>
         <dd class="attachments">

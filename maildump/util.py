@@ -28,6 +28,8 @@ def bool_arg(arg):
 
 
 def decode_header(value):
+    if value is None:
+        return ''
     return ''.join(
         str(decoded, charset or 'utf-8') if isinstance(decoded, bytes) else decoded
         for decoded, charset in _decode_header(value)
