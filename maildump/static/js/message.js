@@ -223,7 +223,7 @@
         var all = $('#messages > tr').show();
         if (filterTerm) {
             all.filter(function() {
-                return !~$(this).text().toLowerCase().indexOf(filterTerm);
+                return !$(this).text().toLowerCase().includes(filterTerm);
             }).hide();
             var selected = Message.getSelected();
             if(selected && !selected.dom().is(':visible')) {
