@@ -40,17 +40,20 @@ def main():
     parser.add_argument('--db', metavar='PATH', help='SQLite database - in-memory if missing')
     parser.add_argument('--htpasswd', metavar='HTPASSWD', help='Apache-style htpasswd file')
     parser.add_argument('-v', '--version', help='Display the version and exit', action='store_true')
-    parser.add_argument('-f', '--foreground', help='Run in the foreground (default if no pid file is specified)',
-                        action='store_true')
+    parser.add_argument(
+        '-f', '--foreground', help='Run in the foreground (default if no pid file is specified)', action='store_true'
+    )
     parser.add_argument('-d', '--debug', help='Run the web app in debug mode', action='store_true')
-    parser.add_argument('-n', '--no-quit', help='Do not allow clients to terminate the application',
-                        action='store_true')
+    parser.add_argument(
+        '-n', '--no-quit', help='Do not allow clients to terminate the application', action='store_true'
+    )
     parser.add_argument('-p', '--pidfile', help='Use a PID file')
     parser.add_argument('--stop', help='Sends SIGTERM to the running daemon (needs --pidfile)', action='store_true')
     args = parser.parse_args()
 
     if args.version:
         from maildump.util import get_version
+
         print('MailDump {0}'.format(get_version()))
         sys.exit(0)
 
@@ -89,16 +92,14 @@ def main():
         print('Htpasswd file does not exist')
         sys.exit(1)
 
-    daemon_kw = {'monkey_greenlet_report': False,
-                 'signal_map': {signal.SIGTERM: terminate_server,
-                                signal.SIGINT: terminate_server}}
+    daemon_kw = {
+        'monkey_greenlet_report': False,
+        'signal_map': {signal.SIGTERM: terminate_server, signal.SIGINT: terminate_server},
+    }
 
     if args.foreground:
         # Do not detach and keep std streams open
-        daemon_kw.update({'detach_process': False,
-                          'stdin': sys.stdin,
-                          'stdout': sys.stdout,
-                          'stderr': sys.stderr})
+        daemon_kw.update({'detach_process': False, 'stdin': sys.stdin, 'stdout': sys.stdout, 'stderr': sys.stderr})
 
     pidfile = None
     if args.pidfile:
@@ -144,9 +145,7 @@ def main():
         app.config['MAILDUMP_NO_QUIT'] = args.no_quit
 
         level = logbook.DEBUG if args.debug else logbook.INFO
-        format_string = (
-            u'[{record.time:%Y-%m-%d %H:%M:%S}]  {record.level_name:<8}  {record.channel}: {record.message}'
-        )
+        format_string = u'[{record.time:%Y-%m-%d %H:%M:%S}]  {record.level_name:<8}  {record.channel}: {record.message}'
         stderr_handler = ColorizedStderrHandler(level=level, format_string=format_string)
         with NullHandler().applicationbound():
             with stderr_handler.applicationbound():

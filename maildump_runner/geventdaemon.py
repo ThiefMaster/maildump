@@ -8,7 +8,7 @@ import daemon
 
 
 class GeventDaemonContext(daemon.DaemonContext):
-    """ DaemonContext for gevent.
+    """DaemonContext for gevent.
 
     Receive same options as a DaemonContext (python-daemon), Except:
 
@@ -42,6 +42,7 @@ class GeventDaemonContext(daemon.DaemonContext):
         # always reinit even when not forked when registering signals
         self._apply_monkey_patch()
         import gevent
+
         if self.gevent_hub is not None:
             # gevent 1.0 only
             gevent.get_hub(self.gevent_hub)
@@ -51,6 +52,7 @@ class GeventDaemonContext(daemon.DaemonContext):
     def _apply_monkey_patch(self):
         import gevent
         import gevent.monkey
+
         if isinstance(self.monkey, dict):
             gevent.monkey.patch_all(**self.monkey)
         elif self.monkey:
@@ -58,6 +60,7 @@ class GeventDaemonContext(daemon.DaemonContext):
 
         if self.monkey_greenlet_report:
             import logging
+
             original_report = gevent.hub.Hub.print_exception
 
             def print_exception(self, context, type, value, tb):
@@ -70,6 +73,7 @@ class GeventDaemonContext(daemon.DaemonContext):
 
     def _setup_gevent_signals(self):
         from gevent.signal import signal as gevent_signal
+
         if self.gevent_signal_map is None:
             gevent_signal(signal.SIGTERM, self.terminate)
             return

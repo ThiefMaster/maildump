@@ -30,7 +30,8 @@ def disconnect():
 
 def create_tables():
     log.debug('Creating tables')
-    _conn.execute("""
+    _conn.execute(
+        """
         CREATE TABLE IF NOT EXISTS message (
             id INTEGER PRIMARY KEY ASC,
             sender TEXT,
@@ -41,9 +42,11 @@ def create_tables():
             type TEXT,
             created_at TIMESTAMP
         )
-    """)
+        """
+    )
 
-    _conn.execute("""
+    _conn.execute(
+        """
         CREATE TABLE IF NOT EXISTS message_part (
             id INTEGER PRIMARY KEY ASC,
             message_id INTEGER NOT NULL,
@@ -56,7 +59,8 @@ def create_tables():
             size INTEGER,
             created_at TIMESTAMP
         )
-    """)
+        """
+    )
 
 
 def iter_message_parts(message):
@@ -81,12 +85,17 @@ def add_message(sender, recipients, body, message):
     bcc_list = split_addresses(decode_header(message['BCC'])) if 'BCC' in message else []
     all_recipients = {'to': to_list, 'cc': cc_list, 'bcc': bcc_list}
     cur = _conn.cursor()
-    cur.execute(sql, (decode_header(sender),
-                      json.dumps(all_recipients),
-                      decode_header(message['Subject']),
-                      body,
-                      message.get_content_type(),
-                      len(body)))
+    cur.execute(
+        sql,
+        (
+            decode_header(sender),
+            json.dumps(all_recipients),
+            decode_header(message['Subject']),
+            body,
+            message.get_content_type(),
+            len(body),
+        ),
+    )
     message_id = cur.lastrowid
     # Store parts (why do we do this for non-multipart at all?!)
     parts = 0
@@ -113,14 +122,19 @@ def _add_message_part(message_id, cid, part):
 
     body = part.get_payload(decode=True)
     body_len = len(body) if body else 0
-    _conn.execute(sql, (message_id,
-                        cid,
-                        part.get_content_type(),
-                        part.get_filename() is not None,
-                        part.get_filename(),
-                        part.get_content_charset(),
-                        body,
-                        body_len))
+    _conn.execute(
+        sql,
+        (
+            message_id,
+            cid,
+            part.get_content_type(),
+            part.get_filename() is not None,
+            part.get_filename(),
+            part.get_content_charset(),
+            body,
+            body_len,
+        ),
+    )
 
 
 def _get_message_cols(lightweight):
@@ -174,7 +188,9 @@ def _get_message_part_types(message_id, types):
             is_attachment = 0
         LIMIT
             1
-    """.format(','.join('?' * len(types)))
+    """.format(
+        ','.join('?' * len(types))
+    )
     return _conn.execute(sql, (message_id,) + types).fetchone()
 
 
@@ -202,7 +218,9 @@ def _message_has_types(message_id, types):
             type IN ({0})
         LIMIT
             1
-    """.format(','.join('?' * len(types)))
+    """.format(
+        ','.join('?' * len(types))
+    )
     res = _conn.execute(sql, (message_id,) + types).fetchone()
     return res is not None
 
