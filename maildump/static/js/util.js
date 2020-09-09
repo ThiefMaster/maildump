@@ -101,9 +101,9 @@ import moment from 'moment';
 (function($, global) {
     'use strict';
 
-    global.registerHotkeys = function registerHotkeys(map) {
+    global.registerHotkeys = function registerHotkeys(map, allowHotkeys) {
         $.each(map, function(key, fn) {
-            $(document).on('keydown', null, key, fn);
+            $(document).on('keydown', null, key, e => (allowHotkeys() ? fn(e) : null));
         });
     };
 })(jQuery, window);

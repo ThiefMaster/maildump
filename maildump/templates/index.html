@@ -7,7 +7,7 @@
     <link rel="stylesheet" type="text/css" href="../static/css/maildump.scss">
     <script type="text/javascript" src="../static/js/maildump.js"></script>
 </head>
-<body>
+<body class="loading-message-list">
     <header class="top">
         <h1>
             <a href="https://github.com/ThiefMaster/maildump" title="MailDump ({{ version }})">MailDump</a>
@@ -60,7 +60,7 @@
                         <a href="#">Source</a>
                     </li>
                     <li class="action download">
-                        <a class="button" href="#">
+                        <a class="button" href="#" target="_blank">
                             <span>Download</span>
                         </a>
                     </li>
@@ -125,14 +125,13 @@
     </script>
     {% endraw %}
 
-    <div class="hidden" id="disconnected-dialog" title="Disconnected">
-        <p>Connection to MailDump lost.</p>
-        <p>Trying to reconnect - be patient!</p>
-    </div>
-
-    <div class="hidden" id="loading-dialog" title="Loading">
-        <p>The initial message list is being loaded.</p>
-        <p>New messages arriving afterwards will be displayed in realtime as soon as they arrive.</p>
+    <div class="overlay">
+        <div class="modal disconnected">
+            <p>Connection to MailDump lost</p>
+        </div>
+        <div class="modal loading-message-list">
+            <p>Loading initial message list</p>
+        </div>
     </div>
 </body>
 </html>

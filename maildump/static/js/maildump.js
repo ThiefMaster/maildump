@@ -1,11 +1,12 @@
 import './jquery-stub';
-import 'jquery-ui';
 import 'jquery.hotkeys';
 import './util';
 import './message';
 
 (function($) {
     'use strict';
+
+    let online = true;
 
     let evtSource = null;
     const waitForEvents = (events, states) => {
@@ -50,16 +51,6 @@ import './message';
                 e.preventDefault();
                 $(document).off('.resizer');
             });
-        });
-
-        $('#disconnected-dialog, #loading-dialog').dialog({
-            autoOpen: false,
-            closeOnEscape: false,
-            dialogClass: 'no-close',
-            draggable: false,
-            modal: true,
-            resizable: false,
-            title: ''
         });
 
         // Top nav actions
@@ -183,7 +174,8 @@ import './message';
         }, {
             connected: () => {
                 console.log('SSE: connected');
-                $('#disconnected-dialog').dialog('close');
+                online = true;
+                document.body.classList.remove('disconnected');
                 Message.loadAll();
             },
             disconnected: () => {
@@ -191,8 +183,8 @@ import './message';
                 if (terminating) {
                     return;
                 }
-                $('#loading-dialog').dialog('close');
-                $('#disconnected-dialog').dialog('open');
+                document.body.classList.add('disconnected');
+                online = false;
             }
         })
 
@@ -250,6 +242,6 @@ import './message';
                 e.preventDefault();
                 $('#search').focus();
             }
-        });
+        }, () => online);
     });
 })(jQuery);

@@ -1,5 +1,4 @@
 @import './reset.css';
-@import './jquery-ui.css';
 
 a, a:visited, a:hover, a:active {
     text-decoration: none;
@@ -289,15 +288,43 @@ body {
     display: none;
 }
 
-.no-close .ui-dialog-titlebar-close {
+p + p {
+    margin-top: 1em;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.8);
+    transition: opacity 100ms;
+    visibility: hidden;
+    opacity: 0;
+    display: flex;
+    justify-content: center;
+}
+
+body.disconnected, body.loading-message-list {
+    .overlay {
+        visibility: visible;
+        opacity: 1;
+    }
+}
+
+.modal {
+    margin: auto;
+    padding: 10px;
+    background: #eee;
+    font-size: 2em;
     display: none;
 }
 
-.ui-widget {
-    font-size: 1em;
-    line-height: 1.1em;
+body.disconnected .modal.disconnected {
+    display: block;
 }
 
-p + p {
-    margin-top: 1em;
+body.loading-message-list .modal.loading-message-list {
+    display: block;
 }

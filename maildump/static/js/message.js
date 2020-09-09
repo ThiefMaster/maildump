@@ -205,14 +205,14 @@
 
     Message.loadAll = function() {
         Message.deleteAll();
-        $('#loading-dialog').dialog('open');
+        document.body.classList.add('loading-message-list')
         restCall('GET', '/messages/').done(function(data) {
             $.each(data.messages, function(i, msg) {
                 Message.add(new Message(msg));
             });
             Message.applyFilter();
         }).always(function() {
-            $('#loading-dialog').dialog('close');
+            document.body.classList.remove('loading-message-list')
         });
     };
 
