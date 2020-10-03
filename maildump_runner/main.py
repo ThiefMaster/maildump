@@ -91,9 +91,17 @@ def main():
         args.htpasswd = os.path.abspath(args.htpasswd)
         print('Htpasswd path is relative, using {0}'.format(args.htpasswd))
 
+    if args.smtp_auth and not os.path.isabs(args.smtp_auth):
+        args.smtp_auth = os.path.abspath(args.smtp_auth)
+        print('SMTP Htpasswd path is relative, using {0}'.format(args.smtp_auth))
+
     # Check if the password file is valid
     if args.htpasswd and not os.path.isfile(args.htpasswd):
         print('Htpasswd file does not exist')
+        sys.exit(1)
+
+    if args.smtp_auth and not os.path.isfile(args.smtp_auth):
+        print('SMTP Htpasswd file does not exist')
         sys.exit(1)
 
     daemon_kw = {
@@ -137,7 +145,7 @@ def main():
 
         app.debug = args.debug
         app.config['MAILDUMP_HTPASSWD'] = None
-        if args.htpasswd:
+        if args.htpasswd or args.smtp_auth:
             # passlib is broken on py39, hence the local import
             # https://foss.heptapod.net/python-libs/passlib/-/issues/115
             try:
@@ -145,6 +153,8 @@ def main():
             except OSError:
                 print('Are you using Python 3.9? If yes, authentication is currently not available due to a bug.\n\n')
                 raise
+
+        if args.htpasswd:
             app.config['MAILDUMP_HTPASSWD'] = HtpasswdFile(args.htpasswd)
         app.config['MAILDUMP_NO_QUIT'] = args.no_quit
         smtp_auth = HtpasswdFile(args.smtp_auth) if args.smtp_auth else None

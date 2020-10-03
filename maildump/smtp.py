@@ -17,11 +17,11 @@ class SMTPChannel(smtpd.SMTPChannel, object):
         self._authorized = False
 
     def is_valid_user(self, auth_data):
-        auth_data_splitted = auth_data.split('\x00')
+        auth_data_splitted = auth_data.split(b'\x00')
         if len(auth_data_splitted) != 3:
             return False
 
-        if not auth_data.startswith('\x00') and auth_data_splitted[0] != auth_data_splitted[1]:
+        if not auth_data.startswith(b'\x00') and auth_data_splitted[0] != auth_data_splitted[1]:
             return False
 
         return self._smtp_auth.check_password(auth_data_splitted[1], auth_data_splitted[2])
@@ -30,17 +30,28 @@ class SMTPChannel(smtpd.SMTPChannel, object):
         if not arg:
             self.push('501 Syntax: EHLO hostname')
             return
-        if self.__greeting:
+        # See issue #21783 for a discussion of this behavior.
+        if self.seen_greeting:
             self.push('503 Duplicate HELO/EHLO')
             return
-        self.__greeting = arg
-        self.push('250-%s' % self.__fqdn)
+        self._set_rset_state()
+        self.seen_greeting = arg
+        self.extended_smtp = True
+        self.push('250-%s' % self.fqdn)
         if self._smtp_auth:
             self.push('250-AUTH PLAIN')
+        if self.data_size_limit:
+            self.push('250-SIZE %s' % self.data_size_limit)
+            self.command_size_limits['MAIL'] += 26
+        if not self._decode_data:
+            self.push('250-8BITMIME')
+        if self.enable_SMTPUTF8:
+            self.push('250-SMTPUTF8')
+            self.command_size_limits['MAIL'] += 10
         self.push('250 HELP')
 
     def smtp_AUTH(self, arg):
-        print >> smtpd.DEBUGSTREAM, '===> AUTH', arg
+        print('auth:', arg, file=smtpd.DEBUGSTREAM)
         if not self._smtp_auth:
             self.push('501 Syntax: AUTH not enabled')
             return
@@ -97,7 +108,7 @@ class SMTPServer(smtpd.SMTPServer, object):
         pair = self.accept()
         if pair is not None:
             conn, addr = pair
-            print >> smtpd.DEBUGSTREAM, 'Incoming connection from %s' % repr(addr)
+            print('Incoming connection from %s' % repr(addr), file=smtpd.DEBUGSTREAM)
             channel = SMTPChannel(self, conn, addr, self._smtp_auth)
 
     def process_message(self, peer, mailfrom, rcpttos, data, **kwargs):
