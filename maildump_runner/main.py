@@ -93,7 +93,7 @@ def main():
 
     if args.smtp_auth and not os.path.isabs(args.smtp_auth):
         args.smtp_auth = os.path.abspath(args.smtp_auth)
-        print('SMTP Htpasswd path is relative, using {0}'.format(args.smtp_auth))
+        print('Htpasswd path for SMTP AUTH is relative, using {0}'.format(args.smtp_auth))
 
     # Check if the password file is valid
     if args.htpasswd and not os.path.isfile(args.htpasswd):
@@ -101,7 +101,7 @@ def main():
         sys.exit(1)
 
     if args.smtp_auth and not os.path.isfile(args.smtp_auth):
-        print('SMTP Htpasswd file does not exist')
+        print('Htpasswd file for SMTP AUTH does not exist')
         sys.exit(1)
 
     daemon_kw = {

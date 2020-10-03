@@ -3,28 +3,28 @@ import smtpd
 from email.parser import BytesParser
 
 from logbook import Logger
-from passlib.apache import HtpasswdFile
 
 from maildump.db import add_message
 
 log = Logger(__name__)
 
 
-class SMTPChannel(smtpd.SMTPChannel, object):
-    def __init__(self, server, conn, addr, smtp_auth):
-        super(SMTPChannel, self).__init__(server, conn, addr)
+class SMTPChannel(smtpd.SMTPChannel):
+    def __init__(self, server, conn, addr, smtp_auth, data_size_limit=smtpd.DATA_SIZE_DEFAULT,
+        map=None, enable_SMTPUTF8=False, decode_data=False):
+        super(SMTPChannel, self).__init__(server, conn, addr, data_size_limit, map, enable_SMTPUTF8, decode_data)
         self._smtp_auth = smtp_auth
         self._authorized = False
 
     def is_valid_user(self, auth_data):
-        auth_data_splitted = auth_data.split(b'\x00')
-        if len(auth_data_splitted) != 3:
+        auth_data_parts = auth_data.split(b'\x00')
+        if len(auth_data_parts) != 3:
             return False
 
-        if not auth_data.startswith(b'\x00') and auth_data_splitted[0] != auth_data_splitted[1]:
+        if not auth_data.startswith(b'\x00') and auth_data_parts[0] != auth_data_parts[1]:
             return False
 
-        return self._smtp_auth.check_password(auth_data_splitted[1], auth_data_splitted[2])
+        return self._smtp_auth.check_password(auth_data_parts[1], auth_data_parts[2])
 
     def smtp_EHLO(self, arg):
         if not arg:
@@ -98,18 +98,24 @@ class SMTPChannel(smtpd.SMTPChannel, object):
         super(SMTPChannel, self).smtp_DATA(arg)
 
 
-class SMTPServer(smtpd.SMTPServer, object):
+class SMTPServer(smtpd.SMTPServer):
     def __init__(self, listener, handler, smtp_auth):
         super(SMTPServer, self).__init__(listener, None)
         self._handler = handler
         self._smtp_auth = smtp_auth
 
-    def handle_accept(self):
-        pair = self.accept()
-        if pair is not None:
-            conn, addr = pair
-            print('Incoming connection from %s' % repr(addr), file=smtpd.DEBUGSTREAM)
-            channel = SMTPChannel(self, conn, addr, self._smtp_auth)
+    def handle_accepted(self, conn, addr):
+        if self._smtp_auth:
+            channel = SMTPChannel(self,
+                conn,
+                addr,
+                self._smtp_auth,
+                self.data_size_limit,
+                self._map,
+                self.enable_SMTPUTF8,
+                self._decode_data)
+        else:
+            super(SMTPServer, self).handle_accepted(conn, addr)
 
     def process_message(self, peer, mailfrom, rcpttos, data, **kwargs):
         return self._handler(sender=mailfrom, recipients=rcpttos, body=data)
