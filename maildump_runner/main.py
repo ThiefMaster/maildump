@@ -38,7 +38,7 @@ def main():
     parser.add_argument('--smtp-auth', metavar='HTPASSWD', help='Apache-style htpasswd file for SMTP authorization. '
                                                                 'WARNING: do not rely only on this as a security '
                                                                 'mechanism, use also additional methods for securing '
-                                                                'MailDump instance, ie. IP restrictions.')
+                                                                'your MailDump instance, ie. IP restrictions.')
     parser.add_argument('--http-ip', default='127.0.0.1', metavar='IP', help='HTTP ip (default: 127.0.0.1)')
     parser.add_argument('--http-port', default=1080, type=int, metavar='PORT', help='HTTP port (default: 1080)')
     parser.add_argument('--db', metavar='PATH', help='SQLite database - in-memory if missing')
