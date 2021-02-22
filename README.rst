@@ -1,6 +1,12 @@
 MailDump
 ========
 
+`pypi: <https://pypi.org/project/maildump/>`_
+
+.. code-block:: bash
+
+   pip install maildump
+
 MailDump is a python-based clone of the awesome `MailCatcher`_ tool. Its
 purpose is to provide developers a way to let applications send emails
 without actual emails being sent to anyone. Additionally lazy developers
