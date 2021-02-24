@@ -1,13 +1,13 @@
 # Maildump [![Available on PyPI](https://img.shields.io/pypi/v/maildump.svg)](https://pypi.python.org/pypi/maildump/) 
 
+
 <img src="https://github.com/ThiefMaster/maildump/blob/master/icon.png"
      align="right"
      width="200"
      style="width: 200px; margin: auto">
 
 
-MailDump is a python-based clone of the awesome [MailCatcher](https://github.com/sj26/mailcatcher/blob/master/README.md) tool. Its
-purpose is to provide developers a way to let applications send emails
+MailDump is a python-based clone of the awesome [MailCatcher](https://github.com/sj26/mailcatcher/blob/master/README.md) tool. Its purpose is to provide developers a way to let applications send emails
 without actual emails being sent to anyone. Additionally lazy developers
 might prefer this over a real SMTP server simply for the sake of it
 being much easier and faster to set up.
