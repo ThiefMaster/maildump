@@ -2,7 +2,6 @@
 
 
 <img src="https://github.com/ThiefMaster/maildump/blob/master/icon.png"
-     align="right"
      width="200"
      style="width: 200px; margin: auto">
 
