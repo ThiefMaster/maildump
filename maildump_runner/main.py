@@ -35,6 +35,10 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--smtp-ip', default='127.0.0.1', metavar='IP', help='SMTP ip (default: 127.0.0.1)')
     parser.add_argument('--smtp-port', default=1025, type=int, metavar='PORT', help='SMTP port (default: 1025)')
+    parser.add_argument('--smtp-auth', metavar='HTPASSWD', help='Apache-style htpasswd file for SMTP authorization. '
+                                                                'WARNING: do not rely only on this as a security '
+                                                                'mechanism, use also additional methods for securing '
+                                                                'your MailDump instance, ie. IP restrictions.')
     parser.add_argument('--http-ip', default='127.0.0.1', metavar='IP', help='HTTP ip (default: 127.0.0.1)')
     parser.add_argument('--http-port', default=1080, type=int, metavar='PORT', help='HTTP port (default: 1080)')
     parser.add_argument('--db', metavar='PATH', help='SQLite database - in-memory if missing')
@@ -87,9 +91,17 @@ def main():
         args.htpasswd = os.path.abspath(args.htpasswd)
         print('Htpasswd path is relative, using {0}'.format(args.htpasswd))
 
+    if args.smtp_auth and not os.path.isabs(args.smtp_auth):
+        args.smtp_auth = os.path.abspath(args.smtp_auth)
+        print('Htpasswd path for SMTP AUTH is relative, using {0}'.format(args.smtp_auth))
+
     # Check if the password file is valid
     if args.htpasswd and not os.path.isfile(args.htpasswd):
         print('Htpasswd file does not exist')
+        sys.exit(1)
+
+    if args.smtp_auth and not os.path.isfile(args.smtp_auth):
+        print('Htpasswd file for SMTP AUTH does not exist')
         sys.exit(1)
 
     daemon_kw = {
@@ -133,7 +145,7 @@ def main():
 
         app.debug = args.debug
         app.config['MAILDUMP_HTPASSWD'] = None
-        if args.htpasswd:
+        if args.htpasswd or args.smtp_auth:
             # passlib is broken on py39, hence the local import
             # https://foss.heptapod.net/python-libs/passlib/-/issues/115
             try:
@@ -141,15 +153,18 @@ def main():
             except OSError:
                 print('Are you using Python 3.9? If yes, authentication is currently not available due to a bug.\n\n')
                 raise
+
+        if args.htpasswd:
             app.config['MAILDUMP_HTPASSWD'] = HtpasswdFile(args.htpasswd)
         app.config['MAILDUMP_NO_QUIT'] = args.no_quit
+        smtp_auth = HtpasswdFile(args.smtp_auth) if args.smtp_auth else None
 
         level = logbook.DEBUG if args.debug else logbook.INFO
         format_string = u'[{record.time:%Y-%m-%d %H:%M:%S}]  {record.level_name:<8}  {record.channel}: {record.message}'
         stderr_handler = ColorizedStderrHandler(level=level, format_string=format_string)
         with NullHandler().applicationbound():
             with stderr_handler.applicationbound():
-                start(args.http_ip, args.http_port, args.smtp_ip, args.smtp_port, args.db)
+                start(args.http_ip, args.http_port, args.smtp_ip, args.smtp_port, smtp_auth, args.db)
 
 
 if __name__ == '__main__':

@@ -12,7 +12,7 @@ log = Logger(__name__)
 stopper = None
 
 
-def start(http_host, http_port, smtp_host, smtp_port, db_path=None):
+def start(http_host, http_port, smtp_host, smtp_port, smtp_auth, db_path=None):
     global stopper
     # Webserver
     log.notice('Starting web server on http://{0}:{1}'.format(http_host, http_port))
@@ -20,7 +20,9 @@ def start(http_host, http_port, smtp_host, smtp_port, db_path=None):
     stopper = http_server.close
     # SMTP server
     log.notice('Starting smtp server on {0}:{1}'.format(smtp_host, smtp_port))
-    SMTPServer((smtp_host, smtp_port), smtp_handler)
+    if smtp_auth:
+        log.notice('Enabled SMTP authorization with htpasswd file {0}'.format(smtp_auth))
+    SMTPServer((smtp_host, smtp_port), smtp_handler, smtp_auth)
     gevent.spawn(asyncore.loop)
     # Database
     connect(db_path)
