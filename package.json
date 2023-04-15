@@ -5,7 +5,7 @@
     "build": "rm maildump/static/dist/*; parcel build maildump/templates/index.html -d maildump/static/dist/ --public-url /static && mv maildump/static/dist/index.html maildump/templates/index.parcel.html"
   },
   "devDependencies": {
-    "parcel": "^1.12.4",
+    "parcel": "^2.8.3",
     "sass": "^1.26.10"
   },
   "dependencies": {
