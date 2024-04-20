@@ -31,14 +31,14 @@ class GeventDaemonContext(daemon.DaemonContext):
         self.monkey = monkey
         self.monkey_greenlet_report = monkey_greenlet_report
         self.gevent_hub = gevent_hub
-        super(GeventDaemonContext, self).__init__(signal_map={}, **daemon_options)
+        super().__init__(signal_map={}, **daemon_options)
         # python-daemon>=2.1 has initgroups=True by default but it requires root privs
         # older versions don't have the kwarg so we set it manually instead of using
         # the constructor argument
         self.initgroups = False
 
     def open(self):
-        super(GeventDaemonContext, self).open()
+        super().open()
         # always reinit even when not forked when registering signals
         self._apply_monkey_patch()
         import gevent
@@ -65,9 +65,9 @@ class GeventDaemonContext(daemon.DaemonContext):
 
             def print_exception(self, context, type, value, tb):
                 try:
-                    logging.error("Error in greenlet: %s" % str(context), exc_info=(type, value, tb))
+                    logging.error('Error in greenlet: %s' % str(context), exc_info=(type, value, tb))
                 finally:
-                    return original_report(self, context, type, value, tb)
+                    return original_report(self, context, type, value, tb)  # noqa: B012
 
             gevent.hub.Hub.print_exception = print_exception
 

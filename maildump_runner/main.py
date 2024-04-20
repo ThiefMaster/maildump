@@ -1,9 +1,8 @@
-#!/usr/bin/env python
-
 import argparse
 import os
 import signal
 import sys
+from pathlib import Path
 
 import lockfile
 import logbook
@@ -16,8 +15,7 @@ from .geventdaemon import GeventDaemonContext
 
 def read_pidfile(path):
     try:
-        with open(path, 'r') as f:
-            return int(f.read())
+        return int(Path(path).read_text())
     except Exception as e:
         raise ValueError(e.message)
 
@@ -41,11 +39,17 @@ def main():
     parser.add_argument('--htpasswd', metavar='HTPASSWD', help='Apache-style htpasswd file')
     parser.add_argument('-v', '--version', help='Display the version and exit', action='store_true')
     parser.add_argument(
-        '-f', '--foreground', help='Run in the foreground (default if no pid file is specified)', action='store_true'
+        '-f',
+        '--foreground',
+        help='Run in the foreground (default if no pid file is specified)',
+        action='store_true',
     )
     parser.add_argument('-d', '--debug', help='Run the web app in debug mode', action='store_true')
     parser.add_argument(
-        '-n', '--no-quit', help='Do not allow clients to terminate the application', action='store_true'
+        '-n',
+        '--no-quit',
+        help='Do not allow clients to terminate the application',
+        action='store_true',
     )
     parser.add_argument('-p', '--pidfile', help='Use a PID file')
     parser.add_argument('--stop', help='Sends SIGTERM to the running daemon (needs --pidfile)', action='store_true')
@@ -54,7 +58,7 @@ def main():
     if args.version:
         from maildump.util import get_version
 
-        print('MailDump {0}'.format(get_version()))
+        print(f'MailDump {get_version()}')
         sys.exit(0)
 
     # Do we just want to stop a running daemon?
@@ -65,12 +69,12 @@ def main():
         try:
             pid = read_pidfile(args.pidfile)
         except ValueError as e:
-            print('Could not read PID file: {0}'.format(e))
+            print(f'Could not read PID file: {e}')
             sys.exit(1)
         try:
             os.kill(pid, signal.SIGTERM)
         except OSError as e:
-            print('Could not send SIGTERM: {0}'.format(e))
+            print(f'Could not send SIGTERM: {e}')
             sys.exit(1)
         sys.exit(0)
 
@@ -82,10 +86,10 @@ def main():
     # Warn about relative paths and absolutize them
     if args.db and not os.path.isabs(args.db):
         args.db = os.path.abspath(args.db)
-        print('Database path is relative, using {0}'.format(args.db))
+        print(f'Database path is relative, using {args.db}')
     if args.htpasswd and not os.path.isabs(args.htpasswd):
         args.htpasswd = os.path.abspath(args.htpasswd)
-        print('Htpasswd path is relative, using {0}'.format(args.htpasswd))
+        print(f'Htpasswd path is relative, using {args.htpasswd}')
 
     # Check if the password file is valid
     if args.htpasswd and not os.path.isfile(args.htpasswd):
@@ -107,7 +111,7 @@ def main():
         if os.path.exists(pidfile):
             pid = read_pidfile(pidfile)
             if not os.path.exists(os.path.join('/proc', str(pid))):
-                print('Deleting obsolete PID file (process {0} does not exist)'.format(pid))
+                print(f'Deleting obsolete PID file (process {pid} does not exist)')
                 os.unlink(pidfile)
         daemon_kw['pidfile'] = TimeoutPIDLockFile(pidfile, 5)
 
@@ -119,7 +123,7 @@ def main():
     try:
         context.open()
     except lockfile.LockTimeout:
-        print('Could not acquire lock on pid file {0}'.format(pidfile))
+        print(f'Could not acquire lock on pid file {pidfile}')
         print('Check if the daemon is already running.')
         sys.exit(1)
     except KeyboardInterrupt:
@@ -145,7 +149,7 @@ def main():
         app.config['MAILDUMP_NO_QUIT'] = args.no_quit
 
         level = logbook.DEBUG if args.debug else logbook.INFO
-        format_string = u'[{record.time:%Y-%m-%d %H:%M:%S}]  {record.level_name:<8}  {record.channel}: {record.message}'
+        format_string = '[{record.time:%Y-%m-%d %H:%M:%S}]  {record.level_name:<8}  {record.channel}: {record.message}'
         stderr_handler = ColorizedStderrHandler(level=level, format_string=format_string)
         with NullHandler().applicationbound():
             with stderr_handler.applicationbound():

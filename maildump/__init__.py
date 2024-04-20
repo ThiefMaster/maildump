@@ -1,5 +1,4 @@
 import asyncore
-
 import gevent
 from gevent.pywsgi import WSGIServer
 from logbook import Logger
@@ -15,11 +14,11 @@ stopper = None
 def start(http_host, http_port, smtp_host, smtp_port, db_path=None):
     global stopper
     # Webserver
-    log.notice('Starting web server on http://{0}:{1}'.format(http_host, http_port))
+    log.notice(f'Starting web server on http://{http_host}:{http_port}')
     http_server = WSGIServer((http_host, http_port), app)
     stopper = http_server.close
     # SMTP server
-    log.notice('Starting smtp server on {0}:{1}'.format(smtp_host, smtp_port))
+    log.notice(f'Starting smtp server on {smtp_host}:{smtp_port}')
     SMTPServer((smtp_host, smtp_port), smtp_handler)
     gevent.spawn(asyncore.loop)
     # Database

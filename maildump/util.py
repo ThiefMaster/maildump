@@ -37,7 +37,7 @@ def decode_header(value):
 
 
 def split_addresses(value):
-    return [('{0} <{1}>'.format(name, addr) if name else addr) for name, addr in getaddresses([value])]
+    return [(f'{name} <{addr}>' if name else addr) for name, addr in getaddresses([value])]
 
 
 def rest(f):

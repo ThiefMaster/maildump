@@ -27,7 +27,7 @@ def check_auth():
         return
     auth = request.authorization
     if auth and htpasswd.check_password(auth.username, auth.password):
-        log.debug('Request authenticated ({0})'.format(auth.username))
+        log.debug(f'Request authenticated ({auth.username})')
         return
     return app.response_class(
         'This MailDump instance is password-protected.', 401, {'WWW-Authenticate': 'Basic realm="MailDump"'}
@@ -116,7 +116,8 @@ def get_message_plain(message_id):
 def _fix_cid_links(soup, message_id):
     def _url_from_cid_match(m):
         return m.group().replace(
-            m.group('replace'), url_for('get_message_part', message_id=message_id, cid=m.group('cid'))
+            m.group('replace'),
+            url_for('get_message_part', message_id=message_id, cid=m.group('cid')),
         )
 
     # Iterate over all attributes that do not contain CSS and replace cid references
