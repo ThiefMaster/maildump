@@ -1,5 +1,6 @@
 target-version = 'py312'
 line-length = 120
+extend-exclude = ['maildump/vendor/']
 
 [lint]
 preview = true

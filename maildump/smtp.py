@@ -1,9 +1,9 @@
 from email.parser import BytesParser
 
-import smtpd
 from logbook import Logger
 
 from maildump.db import add_message
+from maildump.vendor import smtpd
 
 log = Logger(__name__)
 
