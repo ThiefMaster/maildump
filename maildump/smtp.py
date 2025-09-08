@@ -3,18 +3,32 @@ from email.parser import BytesParser
 from logbook import Logger
 
 from maildump.db import add_message
-from maildump.vendor import smtpd
+from aiosmtpd.controller import Controller
 
 log = Logger(__name__)
 
 
-class SMTPServer(smtpd.SMTPServer):
-    def __init__(self, listener, handler):
-        super().__init__(listener, None)
-        self._handler = handler
 
-    def process_message(self, peer, mailfrom, rcpttos, data, **kwargs):
-        return self._handler(sender=mailfrom, recipients=rcpttos, body=data)
+# aiosmtpd handler class
+class SMTPHandler:
+    def __init__(self, handler_func):
+        self._handler = handler_func
+
+    async def handle_DATA(self, server, session, envelope):
+        # envelope.content is bytes
+        result = self._handler(
+            sender=envelope.mail_from,
+            recipients=envelope.rcpt_tos,
+            body=envelope.content
+        )
+        return '250 Message accepted for delivery'
+
+
+def start_smtp_server(host, port, handler_func):
+    handler = SMTPHandler(handler_func)
+    controller = Controller(handler, hostname=host, port=port)
+    controller.start()
+    return controller
 
 
 def smtp_handler(sender, recipients, body):
