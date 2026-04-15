@@ -3,8 +3,8 @@ from datetime import datetime
 from email.header import decode_header as _decode_header
 from email.utils import getaddresses
 from functools import wraps
+from importlib.metadata import PackageNotFoundError, version
 
-import pkg_resources
 from flask import current_app
 from pytz import utc
 
@@ -72,6 +72,6 @@ def rest(f):
 
 def get_version():
     try:
-        return 'v' + pkg_resources.get_distribution('maildump').version
-    except pkg_resources.DistributionNotFound:
+        return 'v' + version('maildump')
+    except PackageNotFoundError:
         return 'dev'
